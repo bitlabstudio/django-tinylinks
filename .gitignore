@@ -1,0 +1,8 @@
+*.egg-info/
+*.pyc
+.tox
+chromedriver.log
+coverage/
+db.sqlite
+dist/
+static/

@@ -1,0 +1,9 @@
+include AUTHORS
+include LICENSE
+include DESCRIPTION
+include CHANGELOG.txt
+include README.md
+graft tinylinks
+global-exclude *.orig *.pyc *.log
+prune tinylinks/tests/coverage/
+prune tinylinks/.ropeproject
