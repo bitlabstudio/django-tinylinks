@@ -2,6 +2,11 @@
 import os
 
 DEBUG = True
+USE_TZ = True
+SITE_ID = 1
+
+TINYLINK_LENGTH = 5
+TINYLINK_PREFIX = '/'
 
 CURRENT_DIR = os.path.dirname(__file__)
 
