@@ -7,5 +7,5 @@ from tinylinks import models
 class TinylinkFactory(factory.Factory):
     FACTORY_FOR = models.Tinylink
 
-    long_url = "thisisalongURL"
+    long_url = "http://www.example.com/thisisalongURL"
     short_url = "vB7f5b"

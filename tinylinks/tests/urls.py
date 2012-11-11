@@ -8,6 +8,6 @@ from django.conf.urls.defaults import include, patterns, url
 
 
 urlpatterns = patterns('',
-    url(r'^', include('tinylinks.urls')),
+    url(r'^s/', include('tinylinks.urls')),
     url(r'^jasmine/', include('django_jasmine.urls')),
 )

@@ -1,6 +1,5 @@
 """Forms for the ``django-tinylinks`` app."""
 import random
-import string
 
 from django import forms
 from django.conf import settings
@@ -13,7 +12,7 @@ class TinylinkForm(forms.ModelForm):
     Creates and validates long and short URL version.
 
     """
-    def __init__(self, tinylink=False, *args, **kwargs):
+    def __init__(self, tinylink=None, *args, **kwargs):
         """
         The Regex field validates the URL input. Allowed are only slugified
         inputs.
@@ -39,15 +38,11 @@ class TinylinkForm(forms.ModelForm):
                 regex=r'^[a-zA-Z0-9-]+$',
                 error_message=("Please use only letters and digits."),
             )
-        self.fields['long_url'] = forms.RegexField(
-            regex=r'^[a-zA-Z0-9-]+$',
-            error_message=("This doesn't seem to be a URL. Please add only"
-                           " the part after the last / (slash)."),
-        )
+        self.fields['long_url'] = forms.URLField()
 
     def clean(self):
         """
-        
+
         """
         self.cleaned_data = super(TinylinkForm, self).clean()
         # Brothers are entities with the same long URL
@@ -81,7 +76,8 @@ class TinylinkForm(forms.ModelForm):
                 while not slug or Tinylink.objects.filter(short_url=slug):
                     slug = ''.join(random.choice(
                         'abcdefghijkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ1234'
-                        '56789-') for x in range(settings.TINYLINK_LENGTH))
+                        '56789-') for x in range(
+                            getattr(settings, 'TINYLINK_LENGTH', 6)))
                 self.cleaned_data.update({'short_url': slug})
         return self.cleaned_data
 

@@ -1,10 +1,9 @@
 """Views for the ``django-tinylinks`` application."""
-from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, RedirectView, UpdateView
+from django.views.generic import CreateView, RedirectView
 
 from tinylinks.forms import TinylinkForm
 from tinylinks.models import Tinylink
@@ -20,7 +19,7 @@ class TinylinkCreateView(CreateView):
 
     @method_decorator(permission_required('tinylinks.add_tinylink'))
     def dispatch(self, *args, **kwargs):
-        self.tinylink = False
+        self.tinylink = None
         if kwargs.get('link_id'):
             # Check if the form needs to be prefilled
             try:
@@ -55,6 +54,5 @@ class TinylinkRedirectView(RedirectView):
                 self.url = reverse('tinylink_notfound')
             if tinylink:
                 # set the redirect long URL
-                self.url = '{0}{1}'.format(settings.TINYLINK_PREFIX,
-                                           tinylink.long_url)
+                self.url = tinylink.long_url
         return super(TinylinkRedirectView, self).dispatch(*args, **kwargs)

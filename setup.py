@@ -11,15 +11,15 @@ def read(fname):
 
 
 setup(
-    name="django-user-tags",
+    name="django-tinylinks",
     version=tinylinks.__version__,
     description=read('DESCRIPTION'),
     long_description=read('README.rst'),
     license='The MIT License',
     platforms=['OS Independent'],
     keywords='django, url shortener, link shortener',
-    author='Martin Brochhaus',
-    author_email='mbrochh@gmail.com',
+    author='Tobias Lorenz',
+    author_email='tobias.lorenz@bitmazk.com',
     url="https://github.com/bitmazk/django-tinylinks",
     packages=find_packages(),
     include_package_data=True,

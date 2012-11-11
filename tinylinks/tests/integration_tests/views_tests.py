@@ -26,7 +26,8 @@ class TinylinkCreateViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
 
     def test_view(self):
         self.should_be_callable_when_authenticated(self.user)
-        resp = self.client.post(self.get_url(), data={'long_url': 'FooBar'})
+        resp = self.client.post(self.get_url(),
+                data={'long_url': 'http://www.example.com/foobar'})
         # User is redirected to a predefined form.
         # She can change the short URL or add a more readable one.
         self.assertRedirects(
@@ -59,7 +60,7 @@ class TinylinkPrefilledCreateViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
 
 
 class TinylinkRedirectViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
-                                 TestCase):
+                                   TestCase):
     """
     Tests for the ``TinylinkRedirectView`` generic view class.
 
@@ -76,8 +77,7 @@ class TinylinkRedirectViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
         # Valid redirection to long URL.
         self.assertEqual(
             resp.get('Location'),
-            'http://testserver{0}{1}'.format(settings.TINYLINK_PREFIX,
-                                             self.tinylink.long_url),
+            self.tinylink.long_url,
             msg=('Should redirect to long url. Response was {0}'.format(resp)))
 
         # Invalid short URL. Send to a 404-like template.

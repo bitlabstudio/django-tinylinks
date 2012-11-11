@@ -3,17 +3,17 @@
 # ===========================================================================
 # Packages essential to this app. Needed by anyone who wants to use this app.
 # ===========================================================================
-django==1.4
-South
+django==1.4.2
+South==0.7.6
 
 
 # ==============================================================
 # Packages needed for running the tests. Needed by contributors.
 # ==============================================================
-factory-boy
-django-libs==0.4
-django-nose
-coverage
-django-coverage
-django-jasmine
-selenium
+factory-boy==1.2.0
+django-libs==0.8
+django-nose==1.1
+coverage==3.5.3
+django-coverage==1.2.2
+django-jasmine==0.3.2
+selenium==2.26.0

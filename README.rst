@@ -1,9 +1,10 @@
 Django Tinylinks
 ================
 
-**WORK IN PROGRESS. DO NOT USE THIS!**
-
 A Django application that adds an URL shortener to your site similar to bit.ly. 
+
+This is an early alpha. Use it with caution.
+
 Installation
 ------------
 
@@ -27,14 +28,42 @@ Add ``tinylinks`` to your ``INSTALLED_APPS``::
         'tinylinks',
     )
 
+Add the ``tinylinks`` URLs to your ``urls.py``::
+
+    urlpatterns = patterns('',
+        ...
+        url(r'^s/', include('tinylinks.urls')),
+    )
+
 Don't forget to migrate your database::
 
     ./manage.py migrate tinylinks
 
+Settings
+--------
+
+TINYLINK_LENGTH
++++++++++++++++
+
+Default: 6
+
+Integer representing the number of characters for your tinylinks. This setting
+is used when the app suggests a new tinylink. Regardless of this setting users
+will be able to create custom tinylinks with up to 32 characters.
+
 Usage
 -----
 
-# TODO
+Just visit the root URL of the app. Let's assume you hooked the app into your
+``urls.py`` at `s/`, then visit `yoursite.com/s/`. You will see a form to
+submit a new long URL.
+
+After submitting, you will be redirected to a new page which shows the
+generated short URL. If you want this URL to have a different short URL, just
+change the short URL to your liking.
+
+Now visit `yoursite.com/s/yourshorturl` and you will be redirected to your long
+URL.
 
 Contribute
 ----------
