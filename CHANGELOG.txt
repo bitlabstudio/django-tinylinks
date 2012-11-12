@@ -1,4 +1,6 @@
-=== 0.2 (in development) ===
+=== 0.3 (in development) ===
+
+=== 0.2 ===
 
 * Enhanced urls.py so that the shortlink URL can end with or without `/` 
 * Added admin to test urls.py so that we can login when testing this app in the
