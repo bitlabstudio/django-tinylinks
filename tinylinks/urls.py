@@ -1,6 +1,5 @@
 """URLs for the ``django-tinylinks`` app."""
-from django.conf.urls.defaults import include, patterns, url
-# from django.contrib import admin
+from django.conf.urls.defaults import patterns, url
 from django.views.generic import TemplateView
 
 from tinylinks.views import TinylinkCreateView, TinylinkRedirectView
@@ -22,7 +21,7 @@ urlpatterns = patterns('',
         name='tinylink_notfound',
     ),
 
-    url(r'^(?P<short_url>[a-zA-Z0-9-]+)/$',
+    url(r'^(?P<short_url>[a-zA-Z0-9-]+)/?$',
         TinylinkRedirectView.as_view(),
         name='tinylink_redirect',
     ),
