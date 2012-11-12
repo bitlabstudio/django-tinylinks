@@ -1,9 +1,7 @@
 include AUTHORS
+include CHANGELOG
 include LICENSE
-include DESCRIPTION
-include CHANGELOG.txt
-include README.md
-graft tinylinks
-global-exclude *.orig *.pyc *.log
-prune tinylinks/tests/coverage/
-prune tinylinks/.ropeproject
+include README.rst
+recursive-include tinylinks/templates *
+recursive-include tinylinks/tests/test_app/templates *
+recursive-include tinylinks/tests/test_app/fixtures *
