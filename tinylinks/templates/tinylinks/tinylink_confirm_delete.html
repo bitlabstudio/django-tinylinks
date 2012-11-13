@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block main %}
+<h1>{% trans "Delete tinylink" %} <em>{{ object }}</em></h1>
+<form action="." method="post">
+    {% csrf_token %}
+    <p>{% trans "Do you really want to delete this tinylink" %} <em>{{ object }}</em>?</p>
+    <input type="submit" value="{% trans "Delete" %}"/>
+    <a href="{% url "tinylink_list" %}">{% trans "or Back" %}</a>
+</form>
+{% endblock %}

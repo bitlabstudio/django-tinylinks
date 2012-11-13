@@ -12,7 +12,7 @@ class TinylinkForm(forms.ModelForm):
     Creates and validates long and short URL version.
 
     """
-    def __init__(self, tinylink=None, *args, **kwargs):
+    def __init__(self, user=None, tinylink=None, *args, **kwargs):
         """
         The Regex field validates the URL input. Allowed are only slugified
         inputs.
@@ -39,6 +39,7 @@ class TinylinkForm(forms.ModelForm):
                 error_message=("Please use only letters and digits."),
             )
         self.fields['long_url'] = forms.URLField()
+        self.user = user
 
     def clean(self):
         """
@@ -55,7 +56,7 @@ class TinylinkForm(forms.ModelForm):
 
         # Only handle with older brothers, if there's no new short URL value
         if (brothers and not input_url
-            or twin and input_url == twin[0].short_url):
+                or twin and input_url == twin[0].short_url):
             if twin:
                 # Twin will be saved, but with no new values.
                 self.instance = twin[0]
@@ -81,5 +82,10 @@ class TinylinkForm(forms.ModelForm):
                 self.cleaned_data.update({'short_url': slug})
         return self.cleaned_data
 
+    def save(self, *args, **kwargs):
+        self.instance.user = self.user
+        return super(TinylinkForm, self).save(*args, **kwargs)
+
     class Meta:
         model = Tinylink
+        exclude = ('user', 'is_broken', 'last_checked')
