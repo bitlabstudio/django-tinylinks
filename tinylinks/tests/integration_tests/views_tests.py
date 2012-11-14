@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 
 from django_libs.tests.factories import UserFactory
 from django_libs.tests.mixins import ViewTestMixin
+from tinylinks.models import Tinylink
 from tinylinks.tests.factories import TinylinkFactory
 
 
@@ -121,7 +122,9 @@ class TinylinkRedirectViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
             resp.get('Location'),
             self.tinylink.long_url,
             msg=('Should redirect to long url. Response was {0}'.format(resp)))
-
+        view_amount = Tinylink.objects.get(pk=self.tinylink.pk).amount_of_views
+        self.assertEqual(view_amount, 1, msg=(
+            'Should set the view amount to 1. Amount:{0}'.format(view_amount)))
         # Invalid short URL. Send to a 404-like template.
         resp = self.client.get('/aaaaa/')
         self.assertEqual(
@@ -129,3 +132,19 @@ class TinylinkRedirectViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
             'http://testserver{0}'.format(reverse('tinylink_notfound')),
             msg=('Should redirect to "Not found" page if short_url is'
                  ' inexistent. Response was {0}'.format(resp.get('Location'))))
+
+
+class StatisticsViewTestCase(TinylinkViewTestsMixin, ViewTestMixin, TestCase):
+    """Tests for the ``StatisticsView`` generic view class."""
+    def get_view_name(self):
+        return 'tinylink_statistics'
+
+    def test_view(self):
+        self.login(self.user)
+        resp = self.client.get(self.get_url())
+        self.assertEqual(resp.status_code, 404, msg=(
+            'Should only be accessible for staff users. Status: {0}.'.format(
+                resp.status_code)))
+        self.user.is_staff = True
+        self.user.save()
+        self.should_be_callable_when_authenticated(self.user)

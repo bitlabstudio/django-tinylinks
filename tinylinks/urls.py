@@ -3,6 +3,7 @@ from django.conf.urls.defaults import patterns, url
 from django.views.generic import TemplateView
 
 from tinylinks.views import (
+    StatisticsView,
     TinylinkCreateView,
     TinylinkDeleteView,
     TinylinkListView,
@@ -43,9 +44,14 @@ urlpatterns = patterns(
     ),
 
     url(
+        r'^statistics/?$',
+        StatisticsView.as_view(),
+        name='tinylink_statistics',
+    ),
+
+    url(
         r'^(?P<short_url>[a-zA-Z0-9-]+)/?$',
         TinylinkRedirectView.as_view(),
         name='tinylink_redirect',
     ),
-
 )

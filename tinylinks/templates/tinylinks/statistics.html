@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n libs_tags %}
+{% load url from future %}
+
+{% block main %}
+<h1>{% trans "Statistics" %}</h1>
+{% if object_list %}
+    <table>
+        <thead>
+            <tr>
+                <td>{{ object_list.0|get_verbose:"user" }}</td>
+                <td>{{ object_list.0|get_verbose:"long_url" }}</td>
+                <td>{{ object_list.0|get_verbose:"short_url" }}</td>
+                <td>{{ object_list.0|get_verbose:"is_broken" }}</td>
+                <td>{{ object_list.0|get_verbose:"last_checked" }}</td>
+                <td>{{ object_list.0|get_verbose:"amount_of_views" }}</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for link in object_list %}
+                <tr>
+                    <td>{{ link.user }}</td>
+                    <td>{{ link.long_url }}</td>
+                    <td><a href="{% url "tinylink_create_prefilled" link_id=link.id %}">{{ link.short_url }}</a></td>
+                    <td>{% if link.is_broken %}{% trans "Invalid" %}{% else %}{% trans "Valid" %}{% endif %}</td>
+                    <td>{{ link.last_checked }}</td>
+                    <td>{{ link.amount_of_views }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+<p>{% trans "No tinylinks added yet." %}</p>
+{% endif %}
+{% endblock %}

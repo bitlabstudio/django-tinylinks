@@ -1,4 +1,12 @@
-=== 0.3 (in development) ===
+=== 0.4 (in development) ===
+
+*
+
+=== 0.3 ===
+
+* Added tinylink list view, delete view
+* Created management command to check the tinylink target URLs
+* Added statistics for staff members
 
 === 0.2 ===
 

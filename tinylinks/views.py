@@ -97,4 +97,20 @@ class TinylinkRedirectView(RedirectView):
             if tinylink:
                 # set the redirect long URL
                 self.url = tinylink.long_url
+                tinylink.amount_of_views += 1
+                tinylink.save()
         return super(TinylinkRedirectView, self).dispatch(*args, **kwargs)
+
+
+class StatisticsView(ListView):
+    """
+    View to list all tinylinks including their statistics.
+
+    """
+    model = Tinylink
+    template_name = "tinylinks/statistics.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404
+        return super(StatisticsView, self).dispatch(request, *args, **kwargs)

@@ -34,6 +34,7 @@ class Tinylink(models.Model):
     :short_url: Shortened URL.
     :is_broken: Set if the given long URL couldn't be validated.
     :last_checked: Datetime of the last validation process.
+    :amount_of_views: Field to count the redirect views.
 
     """
     user = models.ForeignKey(
@@ -61,6 +62,11 @@ class Tinylink(models.Model):
     last_checked = models.DateTimeField(
         default=now(),
         verbose_name=_('Last validation'),
+    )
+
+    amount_of_views = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_('Amount of views'),
     )
 
     def __unicode__(self):
