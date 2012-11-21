@@ -1,0 +1,58 @@
+[
+    {
+        "pk": 7, 
+        "model": "tinylinks.tinylink", 
+        "fields": {
+            "amount_of_views": 0, 
+            "short_url": "djangolibs", 
+            "long_url": "https://github.com/bitmazk/django-libs/tree/master/django_libs", 
+            "user": [
+                "user"
+            ], 
+            "last_checked": "2012-11-13T18:31:14.912Z", 
+            "is_broken": false
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "tinylinks.tinylink", 
+        "fields": {
+            "amount_of_views": 1, 
+            "short_url": "jd7nh4", 
+            "long_url": "http://www.google.de/", 
+            "user": [
+                "user"
+            ], 
+            "last_checked": "2012-11-13T18:31:29.000Z", 
+            "is_broken": false
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "tinylinks.tinylink", 
+        "fields": {
+            "amount_of_views": 5, 
+            "short_url": "github", 
+            "long_url": "https://www.github.com/", 
+            "user": [
+                "staff"
+            ], 
+            "last_checked": "2012-11-15T18:31:29.000Z", 
+            "is_broken": false
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "tinylinks.tinylink", 
+        "fields": {
+            "amount_of_views": 3, 
+            "short_url": "pearljam", 
+            "long_url": "http://de.wikipedia.org/wiki/Pearl_Jam", 
+            "user": [
+                "staff"
+            ], 
+            "last_checked": "2012-11-16T18:31:29.000Z", 
+            "is_broken": false
+        }
+    }
+]

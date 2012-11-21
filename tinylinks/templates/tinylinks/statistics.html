@@ -21,7 +21,7 @@
                 <tr>
                     <td>{{ link.user }}</td>
                     <td>{{ link.long_url }}</td>
-                    <td><a href="{% url "tinylink_create_prefilled" link_id=link.id %}">{{ link.short_url }}</a></td>
+                    <td><a href="{% url "tinylink_update" pk=link.id mode="short" %}">{{ link.short_url }}</a></td>
                     <td>{% if link.is_broken %}{% trans "Invalid" %}{% else %}{% trans "Valid" %}{% endif %}</td>
                     <td>{{ link.last_checked }}</td>
                     <td>{{ link.amount_of_views }}</td>

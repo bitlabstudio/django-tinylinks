@@ -27,13 +27,8 @@ class TinylinkFormTestCase(TestCase):
         tinylink = Tinylink.objects.get(pk=1)
         data.update({'short_url': tinylink.short_url})
         form = TinylinkForm(data=data, user=user)
-        self.assertTrue(form.is_valid(), msg=(
-            'If given correct data, the form should be valid.'))
-        form.save()
-        self.assertEqual(Tinylink.objects.all().count(), 1, msg=(
-            'When saving with equal values, there should be no new tinylink'
-            ' in the. database. Got {0}'.format(
-                Tinylink.objects.all().count())))
+        self.assertFalse(form.is_valid(), msg=(
+            'If the short url is already used, the form should be invalid.'))
 
         # Testing an input with a new short URL. Now, there are two tinylinks
         # with the same long_url.
@@ -57,3 +52,25 @@ class TinylinkFormTestCase(TestCase):
             'When saving with no short url and the same long url, there is no'
             ' savement. The user is directed to the already existing tinylink.'
             ' Got {0}'.format(Tinylink.objects.all().count())))
+
+        # Testing the changing of a long url
+        data = {
+            'long_url': 'http://www.example.com/',
+            'short_url': tinylink.short_url,
+        }
+        form = TinylinkForm(instance=tinylink, data=data, user=user,
+                            mode="change-long")
+        self.assertTrue(form.is_valid(), msg=(
+            'If given correct data, the form should be valid.'))
+        # If the short_url is owned by another user, throw an error.
+        new_user = UserFactory()
+        tinylink.user = new_user
+        tinylink.save()
+        data = {
+            'long_url': 'http://www.example.com/',
+            'short_url': tinylink.short_url,
+        }
+        form = TinylinkForm(instance=tinylink, data=data, user=user,
+                            mode="change-long")
+        self.assertFalse(form.is_valid(), msg=(
+            'If the short url is already used, the form should be invalid.'))

@@ -3,11 +3,27 @@
 {% load url from future %}
 
 {% block main %}
-<h1>{% trans "Shorten you URL" %}</h1>
+{% if form.instance.pk %}
+    {% if mode == "change-short" %}
+        <h1>{% trans "Change short URL of" %} <em>{{ form.instance.long_url }}</em></h1>
+    {% else %}
+        <h1>{% trans "Change long URL of" %} <em>{{ form.instance.short_url }}</em></h1>
+    {% endif %}
+{% else %}
+    <h1>{% trans "Shorten your URL" %} <em></em></h1>
+{% endif %}
 <form method="post" action=".">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="{% trans "Save" %}" />
 </form>
 <a href="{% url "tinylink_list" %}">{% trans "Back to list" %}</a>
+{% if form.instance.pk %}
+    {% if mode == "change-short" %}
+        <a href="{% url "tinylink_update" pk=form.instance.pk mode="change-long" %}">{% trans "Change Long URL instead" %}</a>
+    {% else %}
+        <a href="{% url "tinylink_update" pk=form.instance.pk mode="change-short" %}">{% trans "Change Short URL instead" %}</a>
+    {% endif %}
+    <a href="{% url "tinylink_delete" pk=form.instance.pk %}">{% trans "Delete" %}</a>
+{% endif %}
 {% endblock %}

@@ -53,32 +53,26 @@ class TinylinkCreateViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
         # She can change the short URL or add a more readable one.
         self.assertRedirects(
             resp,
-            reverse('tinylink_create_prefilled', kwargs={
-                'link_id': self.tinylink.id + 1}),
+            reverse('tinylink_update', kwargs={'pk': self.tinylink.id + 1,
+                                               'mode': 'change-short'}),
             msg_prefix=('Should redirect to pre-filled create view.')
         )
 
 
-class TinylinkPrefilledCreateViewTestCase(TinylinkViewTestsMixin,
+class TinylinkUpdateViewTestCase(TinylinkViewTestsMixin,
                                           ViewTestMixin, TestCase):
     """
-    Tests for the ``TinylinkCreateView`` generic view class.
+    Tests for the ``TinylinkUpdateView`` generic view class.
 
-    This time we add an optional parameter.
     """
     def get_view_name(self):
-        return 'tinylink_create_prefilled'
+        return 'tinylink_update'
 
     def get_view_kwargs(self):
-        return {'link_id': self.tinylink.id}
+        return {'pk': self.tinylink.id, 'mode': 'change-short'}
 
     def test_view(self):
         self.login(self.user)
-        resp = self.client.get(reverse('tinylink_create_prefilled',
-                                       kwargs={'link_id': 22}))
-        # We only test the redirect, if a "prefill"-id is non-existing.
-        self.assertRedirects(resp, reverse('tinylink_create'), msg_prefix=(
-            'Should redirect to create view if the id matches no instance.'))
         # Redirect to list after saving.
         data = {
             'long_url': self.tinylink.long_url,
@@ -87,11 +81,6 @@ class TinylinkPrefilledCreateViewTestCase(TinylinkViewTestsMixin,
         resp = self.client.post(self.get_url(), data=data)
         self.assertRedirects(resp, reverse('tinylink_list'), msg_prefix=(
             'Should redirect to list.'))
-        # Also redirect if user is not author of the tinylink.
-        self.login(self.second_user)
-        resp = self.client.get(self.get_url())
-        self.assertRedirects(resp, reverse('tinylink_create'), msg_prefix=(
-            'Should redirect to create view if the id matches no instance.'))
 
 
 class TinylinkDeleteViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,

@@ -3,86 +3,92 @@ from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, DeleteView, ListView, RedirectView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    ListView,
+    RedirectView,
+    UpdateView,
+)
 
 from tinylinks.forms import TinylinkForm
 from tinylinks.models import Tinylink
 
 
-class TinylinkListView(ListView):
+class TinylinkViewMixin(object):
     """
-    View to list all tinylinks of a user.
-
-    """
-    @method_decorator(permission_required('tinylinks.add_tinylink'))
-    def dispatch(self, *args, **kwargs):
-        return super(TinylinkListView, self).dispatch(*args, **kwargs)
-
-    def get_queryset(self):
-        if self.request.user.is_staff:
-            return Tinylink.objects.all()
-        return self.request.user.tinylinks.all()
-
-
-class TinylinkCreateView(CreateView):
-    """
-    View to generate a Tinylink instance including a shortened URL.
+    View to handle general functions for Tinylink objects.
 
     """
     model = Tinylink
     form_class = TinylinkForm
 
     @method_decorator(permission_required('tinylinks.add_tinylink'))
-    def dispatch(self, request, *args, **kwargs):
-        self.tinylink = None
-        if kwargs.get('link_id'):
-            # Check if the form needs to be prefilled
-            try:
-                self.tinylink = Tinylink.objects.get(pk=kwargs.get('link_id'))
-            except Tinylink.DoesNotExist:
-                return HttpResponseRedirect(reverse('tinylink_create'))
-            if not self.tinylink.user == request.user:
-                return HttpResponseRedirect(reverse('tinylink_create'))
-        return super(TinylinkCreateView, self).dispatch(request, *args,
-                                                        **kwargs)
+    def dispatch(self, *args, **kwargs):
+        self.mode = kwargs.get('mode')
+        return super(TinylinkViewMixin, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(TinylinkViewMixin, self).get_context_data(**kwargs)
+        context.update({'mode': self.mode})
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        if hasattr(self, 'get_object') and kwargs.get('pk'):
+            self.object = self.get_object()
+            if (not request.user.is_staff
+                and (not self.object or not self.object.user == request.user)):
+                raise Http404
+        return super(TinylinkViewMixin, self).get(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(TinylinkCreateView, self).get_form_kwargs()
-        # Form prefill object
+        kwargs = super(TinylinkViewMixin, self).get_form_kwargs()
         kwargs.update({
             'user': self.request.user,
-            'tinylink': self.tinylink,
+            'mode': self.mode,
         })
         return kwargs
 
     def get_success_url(self):
-        if self.tinylink:
-            return reverse('tinylink_list')
-        return reverse('tinylink_create_prefilled', kwargs={
-            'link_id': self.object.id})
+        return reverse('tinylink_list')
 
 
-class TinylinkDeleteView(DeleteView):
+class TinylinkListView(TinylinkViewMixin, ListView):
+    """
+    View to list all tinylinks of a user.
+
+    """
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Tinylink.objects.all()
+        return self.request.user.tinylinks.all()
+
+
+class TinylinkCreateView(TinylinkViewMixin, CreateView):
+    """
+    View to generate a Tinylink instance including a shortened URL.
+
+    """
+    def get_success_url(self):
+        return reverse('tinylink_update', kwargs={'pk': self.object.id,
+                                                  'mode': 'change-short'})
+
+
+class TinylinkUpdateView(TinylinkViewMixin, UpdateView):
+    """
+    View to update a Tinylink instance.
+
+    """
+    pass
+
+
+class TinylinkDeleteView(TinylinkViewMixin, DeleteView):
     """
     View to delete a certain tinylink.
 
     """
-    model = Tinylink
-
-    @method_decorator(permission_required('tinylinks.delete_tinylink'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(TinylinkDeleteView, self).dispatch(request, *args,
-                                                        **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.object or not self.object.user == request.user:
-            raise Http404
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
-
-    def get_success_url(self):
-        return reverse('tinylink_list')
+    pass
 
 
 class TinylinkRedirectView(RedirectView):

@@ -8,6 +8,7 @@ from tinylinks.views import (
     TinylinkDeleteView,
     TinylinkListView,
     TinylinkRedirectView,
+    TinylinkUpdateView,
 )
 
 
@@ -26,9 +27,9 @@ urlpatterns = patterns(
     ),
 
     url(
-        r'^update/(?P<link_id>\d+)/$',
-        TinylinkCreateView.as_view(),
-        name='tinylink_create_prefilled',
+        r'^update/(?P<pk>\d+)/(?P<mode>[a-z-]+)/$',
+        TinylinkUpdateView.as_view(),
+        name='tinylink_update',
     ),
 
     url(
