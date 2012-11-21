@@ -19,6 +19,8 @@ class TinylinkListView(ListView):
         return super(TinylinkListView, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
+        if self.request.user.is_staff:
+            return Tinylink.objects.all()
         return self.request.user.tinylinks.all()
 
 
@@ -54,6 +56,8 @@ class TinylinkCreateView(CreateView):
         return kwargs
 
     def get_success_url(self):
+        if self.tinylink:
+            return reverse('tinylink_list')
         return reverse('tinylink_create_prefilled', kwargs={
             'link_id': self.object.id})
 
@@ -65,7 +69,7 @@ class TinylinkDeleteView(DeleteView):
     """
     model = Tinylink
 
-    @method_decorator(permission_required('tinylinks.add_tinylink'))
+    @method_decorator(permission_required('tinylinks.delete_tinylink'))
     def dispatch(self, request, *args, **kwargs):
         return super(TinylinkDeleteView, self).dispatch(request, *args,
                                                         **kwargs)
