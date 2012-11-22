@@ -72,6 +72,9 @@ class Tinylink(models.Model):
     def __unicode__(self):
         return self.short_url
 
+    class Meta:
+        ordering = ['-id']
+
 
 def tinylink_post_save(sender, instance, created, *args, **kwargs):
     if created:

@@ -59,8 +59,8 @@ class TinylinkCreateViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
         )
 
 
-class TinylinkUpdateViewTestCase(TinylinkViewTestsMixin,
-                                          ViewTestMixin, TestCase):
+class TinylinkUpdateViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
+                                 TestCase):
     """
     Tests for the ``TinylinkUpdateView`` generic view class.
 

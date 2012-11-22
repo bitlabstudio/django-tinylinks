@@ -1,7 +1,7 @@
 """Views for the ``django-tinylinks`` application."""
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.views.generic import (
     CreateView,
@@ -38,7 +38,8 @@ class TinylinkViewMixin(object):
         if hasattr(self, 'get_object') and kwargs.get('pk'):
             self.object = self.get_object()
             if (not request.user.is_staff
-                and (not self.object or not self.object.user == request.user)):
+                and (not self.object
+                     or not self.object.user == request.user)):
                 raise Http404
         return super(TinylinkViewMixin, self).get(request, *args, **kwargs)
 
