@@ -5,34 +5,42 @@
 {% block main %}
 <h1>{% trans "Your Tinylinks" %}</h1>
 {% if object_list %}
-    <table>
-        <thead>
-            <tr>
-                <td>{{ object_list.0|get_verbose:"user" }}</td>
-                <td>{{ object_list.0|get_verbose:"long_url" }}</td>
-                <td>{{ object_list.0|get_verbose:"short_url" }}</td>
-                <td>{{ object_list.0|get_verbose:"is_broken" }}</td>
-                <td>{{ object_list.0|get_verbose:"last_checked" }}</td>
-                <td>{% trans "Actions" %}</td>
-            </tr>
-        </thead>
-        <tbody>
-            {% for link in object_list %}
+    <form action="." method="post">
+        {% csrf_token %}
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ link.user }}</td>
-                    <td>{{ link.long_url }}</td>
-                    <td>{{ link.short_url }}</td>
-                    <td>{% if link.is_broken %}{% trans "Invalid" %}{% else %}{% trans "Valid" %}{% endif %}</td>
-                    <td>{{ link.last_checked }}</td>
-                    <td>
-                        <a href="{% url "tinylink_update" pk=link.id mode="change-long" %}">{% trans "Change Long URL" %}</a>
-                        <a href="{% url "tinylink_update" pk=link.id mode="change-short" %}">{% trans "Change Short URL" %}</a>
-                        <a href="{% url "tinylink_delete" pk=link.id %}">{% trans "Delete" %}</a>
-                    </td>
+                    <td>{{ object_list.0|get_verbose:"user" }}</td>
+                    <td>{{ object_list.0|get_verbose:"long_url" }}</td>
+                    <td>{{ object_list.0|get_verbose:"short_url" }}</td>
+                    <td>{{ object_list.0|get_verbose:"is_broken" }}</td>
+                    <td>{{ object_list.0|get_verbose:"validation_error" }}</td>
+                    <td>{{ object_list.0|get_verbose:"redirect_location" }}</td>
+                    <td>{{ object_list.0|get_verbose:"last_checked" }}</td>
+                    <td>{% trans "Actions" %}</td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for link in object_list %}
+                    <tr>
+                        <td>{{ link.user }}</td>
+                        <td>{{ link.long_url }}</td>
+                        <td>{{ link.short_url }}</td>
+                        <td>{% if link.is_broken %}{% trans "Invalid" %}{% else %}{% trans "Valid" %}{% endif %}</td>
+                        <td>{% if link.is_broken %}{{ link.validation_error }}{% endif %}</td>
+                        <td>{% if link.redirect_location %}{{ link.redirect_location }}{% endif %}</td>
+                        <td>{{ link.last_checked }}</td>
+                        <td>
+                            <a href="{% url "tinylink_update" pk=link.id mode="change-long" %}">{% trans "Change Long URL" %}</a>
+                            <a href="{% url "tinylink_update" pk=link.id mode="change-short" %}">{% trans "Change Short URL" %}</a>
+                            <a href="{% url "tinylink_delete" pk=link.id %}">{% trans "Delete" %}</a>
+                            <input type="submit" name="validate{{ link.id }}" value="{% trans "Re-validate URL" %}" {% if not link.can_be_validated %}disabled="disabled"{% endif %} />
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
 {% else %}
 <p>{% trans "No tinylinks added yet." %}</p>
 {% endif %}

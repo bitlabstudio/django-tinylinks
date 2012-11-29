@@ -1,6 +1,6 @@
 === 0.4 (in development) ===
 
-*
+* Added function to start a single link validation
 
 === 0.3 ===
 

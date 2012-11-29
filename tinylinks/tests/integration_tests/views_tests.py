@@ -33,8 +33,23 @@ class TinylinkListViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
         return 'tinylink_list'
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.user)
         self.should_be_callable_when_authenticated(self.staff)
+        self.should_be_callable_when_authenticated(self.user)
+        resp = self.client.post(self.get_url(), data={'validateABC': True})
+        self.assertEqual(resp.status_code, 404, msg=(
+            'Should raise a 404 if pk is not a number. Status was {0}.'.format(
+                resp.status_code)))
+        resp = self.client.post(self.get_url(), data={'validate999': True})
+        self.assertEqual(resp.status_code, 404, msg=(
+            'Should raise a 404 if pk is non-existent. Status was {0}.'.format(
+                resp.status_code)))
+        self.tinylink.long_url = "http://www.google.com"
+        self.tinylink.is_broken = True
+        self.tinylink.save()
+        self.client.post(self.get_url(), data={
+            'validate{0}'.format(self.tinylink.id): True})
+        self.assertFalse(Tinylink.objects.get(pk=self.tinylink.pk).is_broken,
+                         msg="Link should be valid.")
 
 
 class TinylinkCreateViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,

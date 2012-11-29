@@ -12,7 +12,7 @@ from django.views.generic import (
 )
 
 from tinylinks.forms import TinylinkForm
-from tinylinks.models import Tinylink
+from tinylinks.models import Tinylink, validate_long_url
 
 
 class TinylinkViewMixin(object):
@@ -64,6 +64,20 @@ class TinylinkListView(TinylinkViewMixin, ListView):
         if self.request.user.is_staff:
             return Tinylink.objects.all()
         return self.request.user.tinylinks.all()
+
+    def post(self, request, *args, **kwargs):
+        for key in request.POST:
+            if key.startswith('validate'):
+                try:
+                    link_id = int(key.replace('validate', ''))
+                except ValueError:
+                    raise Http404
+                try:
+                    link = Tinylink.objects.get(pk=link_id)
+                except Tinylink.DoesNotExist:
+                    raise Http404
+                validate_long_url(link)
+        return super(TinylinkListView, self).get(request, *args, **kwargs)
 
 
 class TinylinkCreateView(TinylinkViewMixin, CreateView):

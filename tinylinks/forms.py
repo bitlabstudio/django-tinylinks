@@ -101,4 +101,4 @@ class TinylinkForm(forms.ModelForm):
 
     class Meta:
         model = Tinylink
-        exclude = ('user', 'is_broken', 'last_checked', 'amount_of_views')
+        fields = ('long_url', 'short_url')
