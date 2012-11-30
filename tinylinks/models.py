@@ -15,39 +15,38 @@ def get_url_response(pool, link, url):
     validation error.
 
     """
+    response = False
+    link.is_broken = True
+    link.redirect_location = ''
     try:
         response = pool.urlopen('GET', url, retries=2, timeout=5.0)
-    except (MaxRetryError, TimeoutError, HTTPError, gaierror), e:
-        link.is_broken = True
-        if e.__class__ == TimeoutError:
-            link.validation_error = _("Timeout after 5 seconds.")
-        elif e.__class__ == MaxRetryError:
-            link.validation_error = _("Failed after retrying twice.")
-        else:
-            link.validation_error = _("Not found.")
-        response = False
+    except TimeoutError:
+        link.validation_error = _("Timeout after 5 seconds.")
+    except MaxRetryError:
+        link.validation_error = _("Failed after retrying twice.")
+    except (HTTPError, gaierror):
+        link.validation_error = _("Not found.")
     return response
 
 
 def validate_long_url(link):
     """
-    Function to valid a URL. The validator uses urllib3 to test the URL's
+    Function to validate a URL. The validator uses urllib3 to test the URL's
     availability.
 
     """
     http = PoolManager()
     response = get_url_response(http, link, link.long_url)
-    link.redirect_location = ''
     if response and response.status == 200:
         link.is_broken = False
     elif response and response.status == 302:
         # If link is redirected, validate the redirect location.
+        redirect = get_url_response(http, link,
+                                    response.get_redirect_location())
         link.redirect_location = response.get_redirect_location()
-        redirect = get_url_response(http, link, link.redirect_location)
         if redirect.status == 200:
             link.is_broken = False
     else:
-        link.is_broken = True
         link.validation_error = _("URL not accessible.")
     link.last_checked = timezone.now()
     link.save()

@@ -11,4 +11,4 @@ class TestFailedRedirectView(View):
 
 class TestRedirectView(View):
     def dispatch(self, *args, **kwargs):
-        return HttpResponseRedirect(reverse('admin:index'))
+        return HttpResponseRedirect(reverse('tinylink_create'))

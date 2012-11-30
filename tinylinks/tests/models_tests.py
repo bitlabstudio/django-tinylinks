@@ -21,11 +21,6 @@ class TinylinkTestCase(TestCase):
         validate_long_url(link)
         self.assertEqual(Tinylink.objects.get(pk=link.pk).validation_error,
                          "URL not accessible.")
-        link.long_url = "http://localhost:8000/redirect-login/"
-        link.save()
-        validate_long_url(link)
-        self.assertEqual(Tinylink.objects.get(pk=link.pk).redirect_location,
-                         'http://localhost:8000/accounts/login/?next=/')
         link.long_url = "http://localhost:8000/redirect-fail/"
         link.save()
         validate_long_url(link)
@@ -33,7 +28,7 @@ class TinylinkTestCase(TestCase):
         link.long_url = "http://localhost:8000/redirect-test/"
         link.save()
         validate_long_url(link)
-        self.assertFalse(Tinylink.objects.get(pk=link.pk).is_broken)
+        self.assertTrue(Tinylink.objects.get(pk=link.pk).is_broken)
 
         link.last_checked = timezone.now() - timezone.timedelta(minutes=61)
         self.assertTrue(link.can_be_validated())

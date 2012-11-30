@@ -60,24 +60,26 @@ class TinylinkListView(TinylinkViewMixin, ListView):
     View to list all tinylinks of a user.
 
     """
+    @method_decorator(permission_required('tinylinks.add_tinylink'))
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            for key in request.POST:
+                if key.startswith('validate'):
+                    try:
+                        link_id = int(key.replace('validate', ''))
+                    except ValueError:
+                        raise Http404
+                    try:
+                        link = Tinylink.objects.get(pk=link_id)
+                    except Tinylink.DoesNotExist:
+                        raise Http404
+                    validate_long_url(link)
+        return super(TinylinkListView, self).dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         if self.request.user.is_staff:
             return Tinylink.objects.all()
         return self.request.user.tinylinks.all()
-
-    def post(self, request, *args, **kwargs):
-        for key in request.POST:
-            if key.startswith('validate'):
-                try:
-                    link_id = int(key.replace('validate', ''))
-                except ValueError:
-                    raise Http404
-                try:
-                    link = Tinylink.objects.get(pk=link_id)
-                except Tinylink.DoesNotExist:
-                    raise Http404
-                validate_long_url(link)
-        return super(TinylinkListView, self).get(request, *args, **kwargs)
 
 
 class TinylinkCreateView(TinylinkViewMixin, CreateView):
