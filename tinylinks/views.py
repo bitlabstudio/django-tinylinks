@@ -128,6 +128,23 @@ class TinylinkRedirectView(RedirectView):
                 tinylink.save()
         return super(TinylinkRedirectView, self).dispatch(*args, **kwargs)
 
+    def get_redirect_url(self, **kwargs):
+        """
+        We have to override this method.
+
+        The original method tries to do `self.url % kwargs` which will fail
+        when the URL has `%` characters.
+
+        """
+        if self.url:
+            url = self.url
+            args = self.request.META.get('QUERY_STRING', '')
+            if args and self.query_string:
+                url = "%s?%s" % (url, args)
+            return url
+        else:
+            return None
+
 
 class StatisticsView(ListView):
     """

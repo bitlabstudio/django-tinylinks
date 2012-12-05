@@ -151,6 +151,19 @@ class TinylinkRedirectViewTestCase(TinylinkViewTestsMixin, ViewTestMixin,
             msg=('Should redirect to "Not found" page if short_url is'
                  ' inexistent. Response was {0}'.format(resp.get('Location'))))
 
+    def test_can_handle_urls_with_percent_characters(self):
+        """Regression test due to reported internal server errors."""
+        tinylink = TinylinkFactory(
+            user=self.user, long_url='http://www.example.com/test%20Efile.pdf',
+            short_url='abcdef')
+        self.login(self.user)
+        resp = self.client.get(self.get_url(
+            view_kwargs={'short_url': tinylink.short_url, }))
+        self.assertEqual(
+            resp.get('Location'),
+            tinylink.long_url,
+            msg=('Should redirect to long url. Response was {0}'.format(resp)))
+
 
 class StatisticsViewTestCase(TinylinkViewTestsMixin, ViewTestMixin, TestCase):
     """Tests for the ``StatisticsView`` generic view class."""

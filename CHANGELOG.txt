@@ -1,5 +1,8 @@
-=== 0.4 (in development) ===
+=== 0.5 (in development) ===
 
+=== 0.4 ===
+
+* Important bugfix: Tinylinks can now handle URLs with % characters
 * Added function to start a single link validation
 
 === 0.3 ===
@@ -10,7 +13,7 @@
 
 === 0.2 ===
 
-* Enhanced urls.py so that the shortlink URL can end with or without `/` 
+* Enhanced urls.py so that the shortlink URL can end with or without `/`
 * Added admin to test urls.py so that we can login when testing this app in the
   browser
 
