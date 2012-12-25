@@ -19,9 +19,9 @@ def get_url_response(pool, link, url):
     link.is_broken = True
     link.redirect_location = ''
     try:
-        response = pool.urlopen('GET', url, retries=2, timeout=5.0)
+        response = pool.urlopen('GET', url, retries=2, timeout=8.0)
     except TimeoutError:
-        link.validation_error = _("Timeout after 5 seconds.")
+        link.validation_error = _("Timeout after 8 seconds.")
     except MaxRetryError:
         link.validation_error = _("Failed after retrying twice.")
     except (HTTPError, gaierror):
