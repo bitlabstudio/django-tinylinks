@@ -128,7 +128,8 @@ class Tinylink(models.Model):
 
 
 def tinylink_post_save(sender, instance, created, *args, **kwargs):
-    if created:
+    if (created or instance.last_checked < timezone.now()
+            - timezone.timedelta(minutes=5)):
         validate_long_url(instance)
 
 models.signals.post_save.connect(tinylink_post_save, sender=Tinylink)

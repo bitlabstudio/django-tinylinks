@@ -102,3 +102,49 @@ class TinylinkForm(forms.ModelForm):
     class Meta:
         model = Tinylink
         fields = ('long_url', 'short_url')
+
+
+class TinylinkAdminForm(forms.ModelForm):
+    """
+    Creates and updates long and short URL versions in the Django Admin.
+
+    """
+    def __init__(self, *args, **kwargs):
+        """The Regex field validates the URL input."""
+        super(TinylinkAdminForm, self).__init__(*args, **kwargs)
+        if not self.instance.pk:
+            # Hide the short URL field to auto-generate a new instance.
+            self.fields['short_url'].widget = forms.HiddenInput()
+            self.fields['short_url'].required = False
+        else:
+            self.fields['short_url'] = forms.RegexField(
+                regex=r'^[a-z0-9]+$',
+                error_message=(_("Please use only small letters and digits.")),
+                help_text=_("You can add a more readable short URL."),
+                label=self.instance._meta.get_field_by_name(
+                    'short_url')[0].verbose_name,
+            )
+
+    def clean(self):
+        self.cleaned_data = super(TinylinkAdminForm, self).clean()
+        # If short URL is occupied throw out an error, or fail silent.
+        try:
+            twin = Tinylink.objects.get(
+                short_url=self.cleaned_data.get('short_url'),
+            )
+        except Tinylink.DoesNotExist:
+            slug = self.cleaned_data.get('short_url')
+            while not slug or Tinylink.objects.filter(short_url=slug):
+                slug = ''.join(random.choice(
+                    'abcdefghijkmnpqrstuvwxyz123456789') for x in range(
+                        getattr(settings, 'TINYLINK_LENGTH', 6)))
+            self.cleaned_data.update({'short_url': slug})
+        else:
+            if twin != self.instance:
+                self._errors['short_url'] = forms.util.ErrorList([_(
+                    'This short url already exists. Please try another one.')])
+        return self.cleaned_data
+
+    class Meta:
+        model = Tinylink
+        fields = ('user', 'long_url', 'short_url')

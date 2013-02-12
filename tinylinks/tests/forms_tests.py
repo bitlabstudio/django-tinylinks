@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from django_libs.tests.factories import UserFactory
 
-from tinylinks.forms import TinylinkForm
+from tinylinks.forms import TinylinkForm, TinylinkAdminForm
 from tinylinks.models import Tinylink
 
 
@@ -74,3 +74,37 @@ class TinylinkFormTestCase(TestCase):
                             mode="change-long")
         self.assertFalse(form.is_valid(), msg=(
             'If the short url is already used, the form should be invalid.'))
+
+
+class TinylinkAdminFormTestCase(TestCase):
+    """Test for the ``TinylinkAdminForm`` form class."""
+    def test_validates_saves(self):
+        # Testing if the new link is saved.
+        user = UserFactory()
+        data = {
+            'long_url': 'http://www.example.com/FooBar',
+            'user': user.pk,
+        }
+
+        form = TinylinkAdminForm(data=data)
+
+        self.assertTrue(form.is_valid(), msg=(
+            'If given correct data, the form should be valid.'))
+        form.save()
+        self.assertEqual(Tinylink.objects.all().count(), 1, msg=(
+            'When save is called, there should be one link in the database.'
+            ' Got {0}'.format(Tinylink.objects.all().count())))
+
+        # Testing a 'Twin' submit, if the old inputs matches the new ones.
+        tinylink = Tinylink.objects.get(pk=1)
+        data.update({'short_url': tinylink.short_url})
+        form = TinylinkAdminForm(data=data)
+        self.assertFalse(form.is_valid(), msg=(
+            'If the short url is already used, the form should be invalid.'))
+
+        # Testing a fake 'Twin' submit, if the old inputs matches the new ones
+        # and the object is equal the instance.
+        data.update({'short_url': tinylink.short_url})
+        form = TinylinkAdminForm(data=data, instance=tinylink)
+        self.assertTrue(form.is_valid(), msg=(
+            'If the instance is equal the object, the form should be valid.'))
