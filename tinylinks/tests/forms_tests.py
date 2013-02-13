@@ -72,8 +72,11 @@ class TinylinkFormTestCase(TestCase):
         }
         form = TinylinkForm(instance=tinylink, data=data, user=user,
                             mode="change-long")
-        self.assertFalse(form.is_valid(), msg=(
-            'If the short url is already used, the form should be invalid.'))
+        self.assertTrue(form.is_valid(), msg=(
+            'If the short URL is still unique, the form should be valid.'))
+        form.save()
+        self.assertEqual(
+            Tinylink.objects.filter(short_url=tinylink.short_url).count(), 1)
 
 
 class TinylinkAdminFormTestCase(TestCase):

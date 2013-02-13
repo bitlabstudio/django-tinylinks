@@ -61,7 +61,7 @@ class TinylinkForm(forms.ModelForm):
         try:
             twin = Tinylink.objects.get(short_url=self.cleaned_data.get(
                 'short_url'))
-            if not self.user == twin.user:
+            if not self.instance == twin:
                 self._errors['short_url'] = forms.util.ErrorList([_(
                     'This short url already exists. Please try another one.')])
             return self.cleaned_data
