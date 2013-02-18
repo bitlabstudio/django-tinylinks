@@ -5,6 +5,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from urllib2 import urlopen, HTTPError as urllib2Error
 from urllib3 import PoolManager
 from urllib3.exceptions import HTTPError, MaxRetryError, TimeoutError
 
@@ -45,6 +46,15 @@ def validate_long_url(link):
                                     response.get_redirect_location())
         link.redirect_location = response.get_redirect_location()
         if redirect.status == 200:
+            link.is_broken = False
+    elif response and response.status == 502:
+        # Sometimes urllib3 repond with a 502er. Those pages might respond with
+        # a 200er in the Browser, so re-check with urllib2
+        try:
+            response = urlopen(link.long_url, timeout=8.0)
+        except urllib2Error:
+            link.validation_error = _("URL not accessible.")
+        else:
             link.is_broken = False
     else:
         link.validation_error = _("URL not accessible.")
