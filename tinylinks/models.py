@@ -1,11 +1,12 @@
 """Models for the ``django-tinylinks`` app."""
+import urllib2
+from cookielib import CookieJar
 from socket import gaierror
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from urllib2 import urlopen, HTTPError as urllib2Error
 from urllib3 import PoolManager
 from urllib3.exceptions import HTTPError, MaxRetryError, TimeoutError
 
@@ -47,12 +48,21 @@ def validate_long_url(link):
         link.redirect_location = response.get_redirect_location()
         if redirect.status == 200:
             link.is_broken = False
+        elif redirect.status == 302:
+            # Seems like an infinite loop. Maybe the server is looking for a
+            # cookie?
+            cj = CookieJar()
+            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+            request = urllib2.Request(response.get_redirect_location())
+            response = opener.open(request)
+            if response.code == 200:
+                link.is_broken = False
     elif response and response.status == 502:
         # Sometimes urllib3 repond with a 502er. Those pages might respond with
         # a 200er in the Browser, so re-check with urllib2
         try:
-            response = urlopen(link.long_url, timeout=8.0)
-        except urllib2Error:
+            response = urllib2.urlopen(link.long_url, timeout=8.0)
+        except urllib2.HttpError:
             link.validation_error = _("URL not accessible.")
         else:
             link.is_broken = False
