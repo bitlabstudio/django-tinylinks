@@ -62,7 +62,7 @@ def validate_long_url(link):
         # a 200er in the Browser, so re-check with urllib2
         try:
             response = urllib2.urlopen(link.long_url, timeout=8.0)
-        except urllib2.HttpError:
+        except urllib2.HTTPError:
             link.validation_error = _("URL not accessible.")
         else:
             link.is_broken = False
