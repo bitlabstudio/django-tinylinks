@@ -20,14 +20,20 @@ def get_url_response(pool, link, url):
     response = False
     link.is_broken = True
     link.redirect_location = ''
+    # Try to encode e.g. chinese letters
+    try:
+        url = url.encode('utf-8')
+    except UnicodeEncodeError:
+        link.validation_error = _('Unicode error. Check URL characters.')
+        return False
     try:
         response = pool.urlopen('GET', url, retries=2, timeout=8.0)
     except TimeoutError:
-        link.validation_error = _("Timeout after 8 seconds.")
+        link.validation_error = _('Timeout after 8 seconds.')
     except MaxRetryError:
-        link.validation_error = _("Failed after retrying twice.")
+        link.validation_error = _('Failed after retrying twice.')
     except (HTTPError, gaierror):
-        link.validation_error = _("Not found.")
+        link.validation_error = _('Not found.')
     return response
 
 
