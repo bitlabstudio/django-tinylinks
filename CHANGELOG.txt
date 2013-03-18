@@ -1,5 +1,8 @@
 === 0.5 (in development) ===
 
+* Added fix for long urls with unicode characters
+* Added search fields to admin
+
 === 0.4 ===
 
 * Important bugfix: Tinylinks can now handle URLs with % characters
