@@ -1,4 +1,6 @@
-=== 0.5 (in development) ===
+=== (ongoing) ===
+
+=== 0.5 ===
 
 * Added fix for long urls with unicode characters
 * Added search fields to admin
