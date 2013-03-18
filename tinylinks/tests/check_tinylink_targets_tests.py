@@ -8,6 +8,8 @@ from tinylinks.tests.factories import TinylinkFactory
 
 class CommandTestCase(TestCase):
     """Test class for the ``check_tinylink_targets`` admin command."""
+    longMessage = True
+
     def setUp(self):
         """Prepares the testing environment."""
         # database setup
@@ -19,6 +21,8 @@ class CommandTestCase(TestCase):
 
     def test_command(self):
         """Tests a full run of the custom admin command."""
+        management.call_command('check_tinylink_targets')
+        # Run twice, because just one link is checked per interval
         management.call_command('check_tinylink_targets')
         self.assertTrue(
             Tinylink.objects.get(pk=self.tinylink_invalid.id).is_broken,

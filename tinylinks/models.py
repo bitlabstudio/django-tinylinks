@@ -49,20 +49,24 @@ def validate_long_url(link):
         link.is_broken = False
     elif response and response.status == 302:
         # If link is redirected, validate the redirect location.
-        redirect = get_url_response(http, link,
-                                    response.get_redirect_location())
-        link.redirect_location = response.get_redirect_location()
-        if redirect.status == 200:
+        if link.long_url.endswith('.pdf'):
+            # Non-save pdf exception, to avoid relative path redirects
             link.is_broken = False
-        elif redirect.status == 302:
-            # Seems like an infinite loop. Maybe the server is looking for a
-            # cookie?
-            cj = CookieJar()
-            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-            request = urllib2.Request(response.get_redirect_location())
-            response = opener.open(request)
-            if response.code == 200:
+        else:
+            redirect_location = response.get_redirect_location()
+            redirect = get_url_response(http, link, redirect_location)
+            link.redirect_location = redirect_location
+            if redirect.status == 200:
                 link.is_broken = False
+            elif redirect.status == 302:
+                # Seems like an infinite loop. Maybe the server is looking for
+                # a cookie?
+                cj = CookieJar()
+                opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+                request = urllib2.Request(response.get_redirect_location())
+                response = opener.open(request)
+                if response.code == 200:
+                    link.is_broken = False
     elif response and response.status == 502:
         # Sometimes urllib3 repond with a 502er. Those pages might respond with
         # a 200er in the Browser, so re-check with urllib2
@@ -76,6 +80,7 @@ def validate_long_url(link):
         link.validation_error = _("URL not accessible.")
     link.last_checked = timezone.now()
     link.save()
+    return link
 
 
 class Tinylink(models.Model):
@@ -151,11 +156,3 @@ class Tinylink(models.Model):
         if self.last_checked < timezone.now() - timezone.timedelta(minutes=60):
             return True
         return False
-
-
-def tinylink_post_save(sender, instance, created, *args, **kwargs):
-    if (created or instance.last_checked < timezone.now()
-            - timezone.timedelta(minutes=1)):
-        validate_long_url(instance)
-
-models.signals.post_save.connect(tinylink_post_save, sender=Tinylink)

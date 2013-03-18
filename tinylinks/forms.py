@@ -5,7 +5,7 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from tinylinks.models import Tinylink
+from tinylinks.models import Tinylink, validate_long_url
 
 
 class TinylinkForm(forms.ModelForm):
@@ -97,7 +97,8 @@ class TinylinkForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         if not self.instance.pk:
             self.instance.user = self.user
-        return super(TinylinkForm, self).save(*args, **kwargs)
+        self.instance = super(TinylinkForm, self).save(*args, **kwargs)
+        return validate_long_url(self.instance)
 
     class Meta:
         model = Tinylink
