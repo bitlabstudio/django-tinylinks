@@ -88,8 +88,9 @@ class TinylinkForm(forms.ModelForm):
             # This keeps the unique validation of the short URLs alive.
             if not Tinylink.objects.filter(short_url=input_url):
                 while not slug or Tinylink.objects.filter(short_url=slug):
-                    slug = ''.join(random.choice(
-                        'abcdefghijkmnpqrstuvwxyz123456789') for x in range(
+                    slug = ''.join(
+                        random.choice('abcdefghijkmnpqrstuvwxyz123456789')
+                        for x in range(
                             getattr(settings, 'TINYLINK_LENGTH', 6)))
                 self.cleaned_data.update({'short_url': slug})
         return self.cleaned_data
@@ -136,9 +137,9 @@ class TinylinkAdminForm(forms.ModelForm):
         except Tinylink.DoesNotExist:
             slug = self.cleaned_data.get('short_url')
             while not slug or Tinylink.objects.filter(short_url=slug):
-                slug = ''.join(random.choice(
-                    'abcdefghijkmnpqrstuvwxyz123456789') for x in range(
-                        getattr(settings, 'TINYLINK_LENGTH', 6)))
+                slug = ''.join(
+                    random.choice('abcdefghijkmnpqrstuvwxyz123456789')
+                    for x in range(getattr(settings, 'TINYLINK_LENGTH', 6)))
             self.cleaned_data.update({'short_url': slug})
         else:
             if twin != self.instance:
