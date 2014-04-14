@@ -1,5 +1,9 @@
 === (ongoing) ===
 
+=== 0.5.2 ===
+
+* Show all relevant fields in admin list
+
 === 0.5.1 ===
 
 * Show amount of views in admin list
