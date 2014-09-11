@@ -101,12 +101,12 @@ If you want to contribute to this project, please perform the following steps::
     # Clone your fork
     $ mkvirtualenv -p python2.7 django-tinylinks
     $ pip install -r requirements.txt
-    $ ./tinylinks/tests/runtests.sh
+    $ ./tinylinks/tests/runtests.py
     # You should get no failing tests
 
     $ git co -b feature_branch master
     # Implement your feature and tests
-    $ ./tinylinks/tests/runtests.sh
+    $ ./tinylinks/tests/runtests.py
     # You should still get no failing tests
     # Describe your change in the CHANGELOG.txt
     $ git add . && git commit
