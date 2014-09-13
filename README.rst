@@ -10,10 +10,10 @@ Installation
 
 You need to install the following prerequisites in order to use this app::
 
-    pip install django==1.4.2
-    pip install South==0.7.6
-    pip install django-libs==0.8
-    pip install urllib3==1.5
+    pip install django
+    pip install South
+    pip install django-libs
+    pip install urllib3
 
 
 If you want to install the latest stable release from PyPi::
