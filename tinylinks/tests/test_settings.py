@@ -1,9 +1,16 @@
 """Settings that need to be set in order to run the tests."""
+import logging
 import os
+
+
+logging.getLogger("factory").setLevel(logging.WARN)
+logging.getLogger("urllib3").setLevel(logging.WARN)
 
 DEBUG = True
 USE_TZ = True
 SITE_ID = 1
+
+SECRET_KEY = "foobar"
 
 TINYLINK_LENGTH = 5
 TINYLINK_CHECK_INTERVAL = 10

@@ -1,5 +1,5 @@
 """URLs for the ``django-tinylinks`` app."""
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
 
 from tinylinks.views import (

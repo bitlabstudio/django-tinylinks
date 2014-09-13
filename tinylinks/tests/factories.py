@@ -9,7 +9,7 @@ from django_libs.tests.factories import UserFactory
 from tinylinks import models
 
 
-class TinylinkFactory(factory.Factory):
+class TinylinkFactory(factory.DjangoModelFactory):
     FACTORY_FOR = models.Tinylink
 
     user = factory.SubFactory(UserFactory)

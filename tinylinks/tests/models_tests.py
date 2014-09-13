@@ -23,13 +23,13 @@ class TinylinkTestCase(TestCase):
         validate_long_url(link)
         self.assertEqual(Tinylink.objects.get(pk=link.pk).validation_error,
                          "URL not accessible.")
-        #---------------------------------------------
+        # ---------------------------------------------
         # IMPORTANT: Start runserver before testing.
-        #---------------------------------------------
+        # ---------------------------------------------
         try:
             urlopen('http://localhost:8000/admin/')
         except URLError:
-            self.fail('Start runserver before testing.')
+            self.fail('Start manage.py runserver before testing.')
         link.long_url = "http://localhost:8000/redirect-fail/"
         link.save()
         validate_long_url(link)
