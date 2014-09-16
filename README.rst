@@ -1,7 +1,7 @@
 Django Tinylinks
 ================
 
-A Django application that adds an URL shortener to your site similar to bit.ly. 
+A Django application that adds an URL shortener to your site similar to bit.ly.
 
 This is an early alpha. Use it with caution.
 
@@ -15,6 +15,7 @@ You need to install the following prerequisites in order to use this app::
     pip install django-libs
     pip install urllib3
 
+When using Python 2.6, you will also need to install importlib.
 
 If you want to install the latest stable release from PyPi::
 
