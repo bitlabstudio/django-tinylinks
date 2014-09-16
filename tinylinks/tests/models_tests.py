@@ -1,14 +1,14 @@
 """Tests for the models of the ``django-tinylinks`` app."""
 from urllib2 import urlopen, URLError
 
-from django.test import TestCase
+from django.test import TestCase, LiveServerTestCase
 from django.utils import timezone
 
 from tinylinks.models import validate_long_url, Tinylink
 from tinylinks.tests.factories import TinylinkFactory
 
 
-class TinylinkTestCase(TestCase):
+class TinylinkTestCase(TestCase, LiveServerTestCase):
     """Tests for the ``Tinylink`` model class."""
     def test_model(self):
         obj = TinylinkFactory()
@@ -23,18 +23,11 @@ class TinylinkTestCase(TestCase):
         validate_long_url(link)
         self.assertEqual(Tinylink.objects.get(pk=link.pk).validation_error,
                          "URL not accessible.")
-        # ---------------------------------------------
-        # IMPORTANT: Start runserver before testing.
-        # ---------------------------------------------
-        try:
-            urlopen('http://localhost:8000/admin/')
-        except URLError:
-            self.fail('Start manage.py runserver before testing.')
-        link.long_url = "http://localhost:8000/redirect-fail/"
+        link.long_url = "%s/redirect-fail/" % self.live_server_url
         link.save()
         validate_long_url(link)
         self.assertTrue(Tinylink.objects.get(pk=link.pk).is_broken)
-        link.long_url = "http://localhost:8000/redirect-test/"
+        link.long_url = "%s/redirect-test/" % self.live_server_url
         link.save()
         validate_long_url(link)
         self.assertTrue(Tinylink.objects.get(pk=link.pk).is_broken)
