@@ -18,7 +18,7 @@ class TinylinkTestCase(TestCase, LiveServerTestCase):
                                short_url="v4bG4S")
         validate_long_url(link)
         self.assertEqual(Tinylink.objects.get(pk=link.pk).validation_error, "")
-        link.long_url = "http://www.a1b2c3d4e5000.com/"
+        link.long_url = "http://www.a1b2c3d4e5000.com:8888/"
         link.save()
         validate_long_url(link)
         self.assertEqual(Tinylink.objects.get(pk=link.pk).validation_error,

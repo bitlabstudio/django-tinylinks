@@ -15,7 +15,7 @@ class CommandTestCase(TestCase):
         # database setup
         self.tinylink_valid = TinylinkFactory(long_url="http://www.google.com")
         self.tinylink_invalid = TinylinkFactory(
-            long_url="http://www.a1b2c3d4e5000.com/",
+            long_url="http://www.a1b2c3d4e5000.com:8888/",
             short_url="cf7GDS",
         )
 
