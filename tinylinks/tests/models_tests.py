@@ -1,6 +1,4 @@
 """Tests for the models of the ``django-tinylinks`` app."""
-from urllib2 import urlopen, URLError
-
 from django.test import TestCase, LiveServerTestCase
 from django.utils import timezone
 

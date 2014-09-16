@@ -1,5 +1,10 @@
 === (ongoing) ===
 
+=== 0.6 ===
+
+* Improved tests
+* Latest requirements
+
 === 0.5.3 ===
 
 * Fixed irritating status field in admin list
