@@ -4,6 +4,7 @@ from cookielib import CookieJar
 from socket import gaierror
 
 from django.db import models
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
@@ -98,7 +99,7 @@ class Tinylink(models.Model):
 
     """
     user = models.ForeignKey(
-        'auth.User',
+        getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
         verbose_name=_('Author'),
         related_name="tinylinks",
     )
