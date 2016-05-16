@@ -5,7 +5,6 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 import requests
-from urllib3.exceptions import TimeoutError
 
 
 def get_url_response(link, url):
@@ -25,8 +24,6 @@ def get_url_response(link, url):
         return False
     try:
         response = requests.get(url)
-    except TimeoutError:
-        link.validation_error = _('Timeout.')
     except requests.ConnectionError:
         link.validation_error = _('Failed after retrying.')
     except (requests.HTTPError, gaierror):
@@ -35,11 +32,7 @@ def get_url_response(link, url):
 
 
 def validate_long_url(link):
-    """
-    Function to validate a URL. The validator uses urllib3 to test the URL's
-    availability.
-
-    """
+    """Function to validate a URL."""
     response, link = get_url_response(link, link.long_url)
     if response and response.status_code == 200:
         link.is_broken = False
@@ -61,8 +54,6 @@ def validate_long_url(link):
                 if response.status_code == 200:
                     link.is_broken = False
     elif response and response.status_code == 502:
-        # Sometimes urllib3 repond with a 502er. Those pages might respond with
-        # a 200er in the Browser, so re-check with urllib2
         try:
             requests.get(link.long_url)
         except requests.HTTPError:

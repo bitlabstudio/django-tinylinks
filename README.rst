@@ -9,7 +9,7 @@ Installation
 You need to install the following prerequisites in order to use this app::
 
     pip install django
-    pip install urllib3
+    pip install requests
 
 When using Python 2.6, you will also need to install importlib.
 
