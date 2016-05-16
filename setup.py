@@ -3,6 +3,9 @@ from setuptools import setup, find_packages
 import tinylinks
 
 
+install_requires = open('requirements.txt').read().splitlines()
+
+
 def read(fname):
     try:
         return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -23,13 +26,5 @@ setup(
     url="https://github.com/bitmazk/django-tinylinks",
     packages=find_packages(),
     include_package_data=True,
-    tests_require=[
-        'fabric',
-        'factory_boy',
-        'django-nose',
-        'coverage',
-        'django-coverage',
-        'selenium',
-    ],
-    test_suite='tinylinks.tests.runtests.runtests',
+    install_requires=install_requires,
 )

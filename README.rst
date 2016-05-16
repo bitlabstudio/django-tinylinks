@@ -3,16 +3,12 @@ Django Tinylinks
 
 A Django application that adds an URL shortener to your site similar to bit.ly.
 
-This is an early alpha. Use it with caution.
-
 Installation
 ------------
 
 You need to install the following prerequisites in order to use this app::
 
     pip install django
-    pip install South
-    pip install django-libs
     pip install urllib3
 
 When using Python 2.6, you will also need to install importlib.
@@ -34,10 +30,9 @@ Add ``tinylinks`` to your ``INSTALLED_APPS``::
 
 Add the ``tinylinks`` URLs to your ``urls.py``::
 
-    urlpatterns = patterns('',
-        ...
+    urlpatterns = [
         url(r'^s/', include('tinylinks.urls')),
-    )
+    ]
 
 Don't forget to migrate your database::
 
@@ -96,34 +91,21 @@ URL.
 Contribute
 ----------
 
-If you want to contribute to this project, please perform the following steps::
+If you want to contribute to this project, please perform the following steps
+
+.. code-block:: bash
 
     # Fork this repository
     # Clone your fork
-    $ mkvirtualenv -p python2.7 django-tinylinks
-    $ pip install -r requirements.txt
-    $ ./tinylinks/tests/runtests.py
-    # You should get no failing tests
+    mkvirtualenv -p python2.7 django-tinylinks
+    make develop
 
-    $ git co -b feature_branch master
+    git co -b feature_branch master
     # Implement your feature and tests
-    $ ./tinylinks/tests/runtests.py
-    # You should still get no failing tests
-    # Describe your change in the CHANGELOG.txt
-    $ git add . && git commit
-    $ git push origin feature_branch
+    git add . && git commit
+    git push -u origin feature_branch
     # Send us a pull request for your feature branch
 
-Whenever you run the tests a coverage output will be generated in
-``tests/coverage/index.html``. When adding new features, please make sure that
-you keep the coverage at 100%.
-
-If you are making changes that need to be tested in a browser (i.e. to the
-CSS or JS files), you might want to setup a Django project, follow the
-installation insttructions above, then run ``python setup.py develop``. This
-will just place an egg-link to your cloned fork in your project's virtualenv.
-
-Roadmap
--------
-
-Check the issue tracker on github for milestones and features to come.
+In order to run the tests, simply execute ``tox``. This will install two new
+environments (for Django 1.8 and Django 1.9) and run the tests against both
+environments.

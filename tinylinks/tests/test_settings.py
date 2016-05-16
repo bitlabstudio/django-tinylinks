@@ -1,10 +1,6 @@
 """Settings that need to be set in order to run the tests."""
-import logging
 import os
 
-
-logging.getLogger("factory").setLevel(logging.WARN)
-logging.getLogger("urllib3").setLevel(logging.WARN)
 
 DEBUG = True
 USE_TZ = True
@@ -39,19 +35,27 @@ STATICFILES_DIRS = (
     os.path.join(CURRENT_DIR, 'test_static'),
 )
 
-TEMPLATE_DIRS = (
-    os.path.join(CURRENT_DIR, '../templates'),
-)
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'APP_DIRS': True,
+    'DIRS': [os.path.join(CURRENT_DIR, '../templates')],
+    'OPTIONS': {
+        'context_processors': (
+            'django.contrib.auth.context_processors.auth',
+            'django.template.context_processors.request',
+        )
+    }
+}]
 
-JASMINE_TEST_DIRECTORY = os.path.join(CURRENT_DIR, 'jasmine_tests')
-
-COVERAGE_REPORT_HTML_OUTPUT_DIR = os.path.join(
-    CURRENT_DIR, 'coverage')
-
-COVERAGE_MODULE_EXCLUDES = [
-    'tests$', 'test_app$', 'settings$', 'urls$', 'locale$',
-    'migrations', 'fixtures', 'admin$', 'django_extensions',
+MIDDLEWARE_CLASSES = [
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 ]
+
 
 EXTERNAL_APPS = [
     'django.contrib.admin',
@@ -63,16 +67,12 @@ EXTERNAL_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.sites',
-    'django_jasmine',
     'django_libs',
 ]
 
 INTERNAL_APPS = [
-    'django_nose',
     'tinylinks.tests.test_app',
     'tinylinks',
 ]
 
 INSTALLED_APPS = EXTERNAL_APPS + INTERNAL_APPS
-
-COVERAGE_MODULE_EXCLUDES += EXTERNAL_APPS

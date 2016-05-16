@@ -1,34 +1,45 @@
 """Tests for the ``check_tinylink_targets`` admin command."""
 from django.core import management
-from django.test import TestCase
+from django.core.urlresolvers import reverse
+from django.test import TestCase, LiveServerTestCase
 
-from tinylinks.models import Tinylink
-from tinylinks.tests.factories import TinylinkFactory
+from mixer.backend.django import mixer
+from mock import patch
+from requests import Response
+
+from ..models import Tinylink
 
 
-class CommandTestCase(TestCase):
+class CommandTestCase(TestCase, LiveServerTestCase):
     """Test class for the ``check_tinylink_targets`` admin command."""
     longMessage = True
 
     def setUp(self):
         """Prepares the testing environment."""
         # database setup
-        self.tinylink_valid = TinylinkFactory(long_url="http://www.google.com")
-        self.tinylink_invalid = TinylinkFactory(
-            long_url="http://www.a1b2c3d4e5000.com:8888/",
+        self.tinylink1 = mixer.blend(
+            'tinylinks.TinyLink', short_url="vB7f5b",
+            long_url='{}{}'.format(self.live_server_url, reverse('test_view')))
+        self.tinylink2 = mixer.blend(
+            'tinylinks.TinyLink',
+            long_url='http://foobar.foobar',
             short_url="cf7GDS",
         )
 
-    def test_command(self):
-        """Tests a full run of the custom admin command."""
+    @patch('requests.get')
+    def test_command(self, mock):
+        resp = Response()
+        resp.status_code = 200
+        mock.return_value = resp
+
         management.call_command('check_tinylink_targets')
         # Run twice, because just one link is checked per interval
         management.call_command('check_tinylink_targets')
-        self.assertTrue(
-            Tinylink.objects.get(pk=self.tinylink_invalid.id).is_broken,
-            msg=('Should still be broken.'),
+        self.assertFalse(
+            Tinylink.objects.get(pk=self.tinylink1.id).is_broken,
+            msg=('Should not be broken.'),
         )
         self.assertFalse(
-            Tinylink.objects.get(pk=self.tinylink_valid.id).is_broken,
-            msg=('Should be set to not broken.'),
+            Tinylink.objects.get(pk=self.tinylink2.id).is_broken,
+            msg=('Should not be broken.'),
         )

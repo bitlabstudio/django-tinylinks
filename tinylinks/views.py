@@ -11,8 +11,9 @@ from django.views.generic import (
     UpdateView,
 )
 
-from tinylinks.forms import TinylinkForm
-from tinylinks.models import Tinylink, validate_long_url
+from .forms import TinylinkForm
+from .models import Tinylink
+from .utils import validate_long_url
 
 
 class TinylinkViewMixin(object):
@@ -37,9 +38,8 @@ class TinylinkViewMixin(object):
         self.object = None
         if hasattr(self, 'get_object') and kwargs.get('pk'):
             self.object = self.get_object()
-            if (not request.user.is_staff
-                and (not self.object
-                     or not self.object.user == request.user)):
+            if ((not self.object or self.object.user != request.user) and not
+                    request.user.is_staff):
                 raise Http404
         return super(TinylinkViewMixin, self).get(request, *args, **kwargs)
 
@@ -60,21 +60,19 @@ class TinylinkListView(TinylinkViewMixin, ListView):
     View to list all tinylinks of a user.
 
     """
-    @method_decorator(permission_required('tinylinks.add_tinylink'))
-    def dispatch(self, request, *args, **kwargs):
-        if request.method == 'POST':
-            for key in request.POST:
-                if key.startswith('validate'):
-                    try:
-                        link_id = int(key.replace('validate', ''))
-                    except ValueError:
-                        raise Http404
-                    try:
-                        link = Tinylink.objects.get(pk=link_id)
-                    except Tinylink.DoesNotExist:
-                        raise Http404
-                    validate_long_url(link)
-        return super(TinylinkListView, self).dispatch(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        for key in request.POST:
+            if key.startswith('validate'):
+                try:
+                    link_id = int(key.replace('validate', ''))
+                except ValueError:
+                    raise Http404
+                try:
+                    link = Tinylink.objects.get(pk=link_id)
+                except Tinylink.DoesNotExist:
+                    raise Http404
+                validate_long_url(link)
+        return super(TinylinkListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -114,36 +112,21 @@ class TinylinkRedirectView(RedirectView):
 
     """
     def dispatch(self, *args, **kwargs):
-        if kwargs.get('short_url'):
-            try:
-                tinylink = Tinylink.objects.get(short_url=kwargs.get(
-                    'short_url'))
-            except Tinylink.DoesNotExist:
-                tinylink = None
-                self.url = reverse('tinylink_notfound')
-            if tinylink:
-                # set the redirect long URL
-                self.url = tinylink.long_url
-                tinylink.amount_of_views += 1
-                tinylink.save()
+        try:
+            tinylink = Tinylink.objects.get(short_url=kwargs.get(
+                'short_url'))
+        except Tinylink.DoesNotExist:
+            tinylink = None
+            self.url = reverse('tinylink_notfound')
+        if tinylink:
+            # set the redirect long URL
+            self.url = tinylink.long_url
+            tinylink.amount_of_views += 1
+            tinylink.save()
         return super(TinylinkRedirectView, self).dispatch(*args, **kwargs)
 
     def get_redirect_url(self, **kwargs):
-        """
-        We have to override this method.
-
-        The original method tries to do `self.url % kwargs` which will fail
-        when the URL has `%` characters.
-
-        """
-        if self.url:
-            url = self.url
-            args = self.request.META.get('QUERY_STRING', '')
-            if args and self.query_string:
-                url = "%s?%s" % (url, args)
-            return url
-        else:
-            return None
+        return self.url
 
 
 class StatisticsView(ListView):

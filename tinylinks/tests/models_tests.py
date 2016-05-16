@@ -1,34 +1,21 @@
 """Tests for the models of the ``django-tinylinks`` app."""
 from django.test import TestCase, LiveServerTestCase
-from django.utils import timezone
+from django.utils.timezone import now, timedelta
 
-from tinylinks.models import validate_long_url, Tinylink
-from tinylinks.tests.factories import TinylinkFactory
+from mixer.backend.django import mixer
 
 
 class TinylinkTestCase(TestCase, LiveServerTestCase):
     """Tests for the ``Tinylink`` model class."""
+    def setUp(self):
+        self.link = mixer.blend(
+            'tinylinks.TinyLink', short_url="vB7f5b",
+            long_url="http://www.example.com/thisisalongURL")
+
     def test_model(self):
-        obj = TinylinkFactory()
-        self.assertTrue(obj.pk)
+        self.assertTrue(str(self.link))
 
-        link = TinylinkFactory(long_url="http://www.google.com/",
-                               short_url="v4bG4S")
-        validate_long_url(link)
-        self.assertEqual(Tinylink.objects.get(pk=link.pk).validation_error, "")
-        link.long_url = "http://www.a1b2c3d4e5000.com:8888/"
-        link.save()
-        validate_long_url(link)
-        self.assertEqual(Tinylink.objects.get(pk=link.pk).validation_error,
-                         "URL not accessible.")
-        link.long_url = "%s/redirect-fail/" % self.live_server_url
-        link.save()
-        validate_long_url(link)
-        self.assertTrue(Tinylink.objects.get(pk=link.pk).is_broken)
-        link.long_url = "%s/redirect-test/" % self.live_server_url
-        link.save()
-        validate_long_url(link)
-        self.assertTrue(Tinylink.objects.get(pk=link.pk).is_broken)
-
-        link.last_checked = timezone.now() - timezone.timedelta(minutes=61)
-        self.assertTrue(link.can_be_validated())
+    def test_can_be_validated(self):
+        self.assertFalse(self.link.can_be_validated())
+        self.link.last_checked = now() - timedelta(minutes=61)
+        self.assertTrue(self.link.can_be_validated())

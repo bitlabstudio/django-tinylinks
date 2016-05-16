@@ -1,17 +1,17 @@
 """Tests for the forms of the ``django-tinylinks`` app."""
 from django.test import TestCase
 
-from django_libs.tests.factories import UserFactory
+from mixer.backend.django import mixer
 
-from tinylinks.forms import TinylinkForm, TinylinkAdminForm
-from tinylinks.models import Tinylink
+from ..forms import TinylinkForm, TinylinkAdminForm
+from ..models import Tinylink
 
 
 class TinylinkFormTestCase(TestCase):
     """Test for the ``TinylinkForm`` form class."""
     def test_validates_saves(self):
         # Testing if the new link is saved.
-        user = UserFactory()
+        user = mixer.blend('auth.User')
         data = {'long_url': 'http://www.example.com/FooBar'}
 
         form = TinylinkForm(data=data, user=user)
@@ -63,7 +63,7 @@ class TinylinkFormTestCase(TestCase):
         self.assertTrue(form.is_valid(), msg=(
             'If given correct data, the form should be valid.'))
         # If the short_url is owned by another user, throw an error.
-        new_user = UserFactory()
+        new_user = mixer.blend('auth.User')
         tinylink.user = new_user
         tinylink.save()
         data = {
@@ -83,7 +83,7 @@ class TinylinkAdminFormTestCase(TestCase):
     """Test for the ``TinylinkAdminForm`` form class."""
     def test_validates_saves(self):
         # Testing if the new link is saved.
-        user = UserFactory()
+        user = mixer.blend('auth.User')
         data = {
             'long_url': 'http://www.example.com/FooBar',
             'user': user.pk,

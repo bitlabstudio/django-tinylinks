@@ -10,7 +10,8 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from tinylinks.models import Tinylink, validate_long_url
+from ...models import Tinylink
+from ...utils import validate_long_url
 
 
 class Command(BaseCommand):

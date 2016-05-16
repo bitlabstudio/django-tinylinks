@@ -3,9 +3,11 @@ import random
 
 from django import forms
 from django.conf import settings
+from django.forms.utils import ErrorList
 from django.utils.translation import ugettext_lazy as _
 
-from tinylinks.models import Tinylink, validate_long_url
+from .models import Tinylink
+from .utils import validate_long_url
 
 
 class TinylinkForm(forms.ModelForm):
@@ -29,8 +31,7 @@ class TinylinkForm(forms.ModelForm):
         else:
             long_help_text = _("The long URL isn't editable at the moment.")
         self.fields['long_url'] = forms.URLField(
-            label=self.instance._meta.get_field_by_name(
-                'long_url')[0].verbose_name,
+            label=self.instance._meta.get_field('long_url').verbose_name,
             help_text=long_help_text,
         )
         if not self.instance.pk:
@@ -47,12 +48,12 @@ class TinylinkForm(forms.ModelForm):
                 self.fields['long_url'].widget.attrs['readonly'] = True
                 self.fields['short_url'] = forms.RegexField(
                     regex=r'^[a-z0-9]+$',
-                    error_message=(_("Please use only small letters and"
-                                     " digits.")),
                     help_text=_("You can add a more readable short URL."),
-                    label=self.instance._meta.get_field_by_name(
-                        'short_url')[0].verbose_name,
+                    label=self.instance._meta.get_field(
+                        'short_url').verbose_name,
                 )
+                self.fields['short_url'].error_messages['invalid'] = _(
+                    "Please use only small letters and digits.")
         self.user = user
 
     def clean(self):
@@ -62,7 +63,7 @@ class TinylinkForm(forms.ModelForm):
             twin = Tinylink.objects.get(short_url=self.cleaned_data.get(
                 'short_url'))
             if not self.instance == twin:
-                self._errors['short_url'] = forms.util.ErrorList([_(
+                self._errors['short_url'] = ErrorList([_(
                     'This short url already exists. Please try another one.')])
             return self.cleaned_data
         except Tinylink.DoesNotExist:
@@ -121,11 +122,11 @@ class TinylinkAdminForm(forms.ModelForm):
         else:
             self.fields['short_url'] = forms.RegexField(
                 regex=r'^[a-z0-9]+$',
-                error_message=(_("Please use only small letters and digits.")),
                 help_text=_("You can add a more readable short URL."),
-                label=self.instance._meta.get_field_by_name(
-                    'short_url')[0].verbose_name,
+                label=self.instance._meta.get_field('short_url').verbose_name,
             )
+            self.fields['short_url'].error_messages['invalid'] = _(
+                "Please use only small letters and digits.")
 
     def clean(self):
         self.cleaned_data = super(TinylinkAdminForm, self).clean()
@@ -143,7 +144,7 @@ class TinylinkAdminForm(forms.ModelForm):
             self.cleaned_data.update({'short_url': slug})
         else:
             if twin != self.instance:
-                self._errors['short_url'] = forms.util.ErrorList([_(
+                self._errors['short_url'] = ErrorList([_(
                     'This short url already exists. Please try another one.')])
         return self.cleaned_data
 

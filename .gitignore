@@ -1,9 +1,8 @@
 *.egg-info/
 *.pyc
 .tox
-.DS_STORE
-chromedriver.log
 coverage/
 db.sqlite
 dist/
 static/
+.coverage
