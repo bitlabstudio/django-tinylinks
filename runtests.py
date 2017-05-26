@@ -12,9 +12,10 @@ from fabric.colors import green, red
 
 if __name__ == '__main__':
     local('flake8 --ignore=E126 --ignore=W391 --statistics'
-          ' --exclude=submodules,migrations,south_migrations,build .')
+          ' --exclude=submodules,migrations,south_migrations,build,.tox .')
     local('coverage run --source="tinylinks" manage.py test -v 2'
-          ' --traceback --failfast --settings=tinylinks.tests.settings'
+          ' --traceback --failfast'
+          ' --settings=tinylinks.tests.settings'
           ' --pattern="*_tests.py"')
     local('coverage html -d coverage --omit="*__init__*,*/settings/*,'
           '*/migrations/*,*/south_migrations/*,*/tests/*,*admin*"')
